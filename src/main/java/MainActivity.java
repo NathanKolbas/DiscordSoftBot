@@ -2,6 +2,8 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +17,8 @@ public class MainActivity {
     final static int SOFT161_ID = 80912;
     final static String JSON_FILE_NAME = "CurrentToDos.json";
 
+    public static PrintStream previousConsole;
+    public static PrintStream previousErrConsole;
     public static ByteArrayOutputStream newConsole;
     public static String webhookUrlDiscord;
     public static String webhookUrlSlack;
@@ -30,7 +34,8 @@ public class MainActivity {
         } catch (ParseException e) {
             e.printStackTrace();
             System.out.println("Was unable to parse the time it was due");
-            SlackWebhook.sendSlackMessage(webhookUrlSlack, newConsole.toString());
+            writeErrFile();
+            SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
         }
         String formattedDueDate = dueDate == null ? "sorry, was unable to get the due date..." : dateFormatterCST.format(dueDate);
 
@@ -48,17 +53,20 @@ public class MainActivity {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Unable to send out the Discord message...");
-            SlackWebhook.sendSlackMessage(webhookUrlSlack, newConsole.toString());
+            writeErrFile();
+            SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
         }
     }
 
     public static void main(String[] args) {
         // This is where the program will start when ran.
         // Preserve current console. It will no longer send System.out.print to the console. To restore run `System.setOut(previousConsole);`
-        PrintStream previousConsole = System.out;
+        previousConsole = System.out;
+        previousErrConsole = System.err;
         // Set the standard output to use newConsole so we can send logs to Slack.
         newConsole = new ByteArrayOutputStream();
         System.setOut(new PrintStream(newConsole));
+        System.setErr(new PrintStream(newConsole));
 
         // Getting arguments
         String token = args[0]; // Bearer token for Canvas API
@@ -72,12 +80,20 @@ public class MainActivity {
         } catch (Exception e) {
             // Was unable to GET from Canvas for some reason.
             e.printStackTrace();
-            SlackWebhook.sendSlackMessage(webhookUrlSlack, newConsole.toString());
+            writeErrFile();
+            SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
         }
 
         // We check for the file and then IDs to see if this is the first time the assignment has been assigned.
         if (newToDos != null) {
-            CanvasJSON[] pastToDos = Converter.readJsonFile(JSON_FILE_NAME);
+            CanvasJSON[] pastToDos = null;
+            try {
+                pastToDos = Converter.readJsonFile(JSON_FILE_NAME);
+            } catch (IOException e) {
+                e.printStackTrace();
+                writeErrFile();
+                SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
+            }
 
             // Getting all the past IDs
             Set<Long> pastIds = new HashSet<>();
@@ -114,8 +130,9 @@ public class MainActivity {
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();
+                        writeErrFile();
                         System.out.println("Was unable to parse the time it was due");
-                        SlackWebhook.sendSlackMessage(webhookUrlSlack, newConsole.toString());
+                        SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
                     }
                 } else {
                     // Send out the message! This means it was the first time it was assigned.
@@ -132,7 +149,8 @@ public class MainActivity {
                         diffInDays = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
                     } catch (ParseException e) {
                         e.printStackTrace();
-                        SlackWebhook.sendSlackMessage(webhookUrlSlack, newConsole.toString());
+                        writeErrFile();
+                        SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
                     }
 
                     // Creating the description
@@ -146,7 +164,23 @@ public class MainActivity {
             }
 
             // Add the new to dos to the JSON file
-            Converter.writeJsonFile(JSON_FILE_NAME, newToDos);
+            try {
+                Converter.writeJsonFile(JSON_FILE_NAME, newToDos);
+            } catch (IOException e) {
+                e.printStackTrace();
+                writeErrFile();
+                SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
+            }
+        }
+    }
+
+    public static void writeErrFile() {
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd' 'hh-mm-ss a");
+        try {
+            Files.write(Paths.get(format.format(now) + ".log"), newConsole.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

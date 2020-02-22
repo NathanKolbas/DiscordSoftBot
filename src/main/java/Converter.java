@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,31 +18,20 @@ public class Converter {
         return getObjectWriter().writeValueAsString(obj);
     }
 
-    public static void writeJsonFile(String filePath, CanvasJSON[] canvasJSONS) {
-        try {
-            Files.write(Paths.get(filePath), Converter.toJsonString(canvasJSONS).getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void writeJsonFile(String filePath, CanvasJSON[] canvasJSONS) throws IOException {
+        Files.write(Paths.get(filePath), Converter.toJsonString(canvasJSONS).getBytes());
     }
 
-    public static CanvasJSON[] readJsonFile(String filePath) {
+    public static CanvasJSON[] readJsonFile(String filePath) throws IOException {
         StringBuilder jsonString = new StringBuilder();
         File file = new File(filePath);
         if (file.exists()) {
-            try {
-                Scanner scanner = new Scanner(file);
-                while (scanner.hasNextLine()) {
-                    jsonString.append(scanner.nextLine());
-                }
-                return Converter.fromJsonString(jsonString.toString());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                jsonString.append(scanner.nextLine());
             }
         }
-        return null;
+        return Converter.fromJsonString(jsonString.toString());
     }
 
     private static ObjectReader reader;
