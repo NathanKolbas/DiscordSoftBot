@@ -1,3 +1,5 @@
+package com.discordsoftwebhook;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.OutputStream;

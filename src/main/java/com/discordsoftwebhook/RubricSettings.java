@@ -1,3 +1,5 @@
+package com.discordsoftwebhook;
+
 import com.fasterxml.jackson.annotation.*;
 
 public class RubricSettings {

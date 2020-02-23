@@ -1,3 +1,6 @@
+package com.discordsoftwebhook;
+
+import com.discordsoftwebhook.Rating;
 import com.fasterxml.jackson.annotation.*;
 
 public class Rubric {

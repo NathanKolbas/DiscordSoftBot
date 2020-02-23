@@ -1,3 +1,5 @@
+package com.discordsoftwebhook;
+
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

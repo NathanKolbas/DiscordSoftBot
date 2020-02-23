@@ -1,3 +1,5 @@
+package com.discordsoftwebhook;
+
 import com.fasterxml.jackson.annotation.*;
 
 import javax.net.ssl.HttpsURLConnection;
