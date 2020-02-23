@@ -9,15 +9,14 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity {
     final static int SOFT161_ID = 80912;
     final static String JSON_FILE_NAME = "CurrentToDos.json";
+
+    private static CanvasJSON[] newToDos = null;
 
     public static PrintStream previousConsole;
     public static PrintStream previousErrConsole;
@@ -60,6 +59,24 @@ public class MainActivity {
         }
     }
 
+    public static int getDaysUntil(String date) {
+        float diffInDays = 0;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date assignmentsDueDate = format.parse(date);
+            Date now = format.parse(format.format(new Date()));
+            long diffInMillis = assignmentsDueDate.getTime() - now.getTime();
+            diffInDays = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+            System.out.println(diffInDays);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            writeErrFile();
+            System.out.println("Was unable to parse the time it was due");
+            SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
+        }
+        return (int) diffInDays;
+    }
+
     public static void main(String[] args) {
         // This is where the program will start when ran.
         // Preserve current console. It will no longer send System.out.print to the console. To restore run `System.setOut(previousConsole);`
@@ -76,7 +93,6 @@ public class MainActivity {
         webhookUrlSlack = args[2];
 
         // Getting Canvas ToDos
-        CanvasJSON[] newToDos = null;
         try {
             newToDos = CanvasJSON.getToDoAPI(SOFT161_ID, token);
         } catch (Exception e) {
@@ -110,50 +126,27 @@ public class MainActivity {
                 // Check each to-do
                 // Currently setup to send out when assigned, one week, and the day before.
                 if (pastIds.contains(currentToDo.getAssignment().getID())) {
-                    // Even though the Date object is reporting that it is in CST it is actually in UTC time.
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date dateNow = new Date();
-                    try {
-                        Date assignmentsDueDate = format.parse(currentToDo.getAssignment().getDueAt());
-                        long diffInMillis = Math.abs(assignmentsDueDate.getTime() - dateNow.getTime());
-                        long diffInDays = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-                        if (diffInDays == 7) {
-                            // Send out the message! It is a week before it is due.
-                            System.out.println("Send out the message! It is a week before it is due.");
-                            // Creating the description
-                            String description = "The assignment is due in one week at ";
-                            sendMessage(webhookUrlDiscord, currentToDo.getAssignment().getName(), description, currentToDo.getAssignment().getDueAt(), currentToDo.getAssignment().getHTMLURL());
-                        } else if (diffInDays == 1) {
-                            // Send out the message! It is a day before it is due
-                            System.out.println("Send out the message! It is a day before it is due.");
-                            // Creating the description
-                            String description = "The assignment is due tomorrow at ";
-                            sendMessage(webhookUrlDiscord, currentToDo.getAssignment().getName(), description, currentToDo.getAssignment().getDueAt(), currentToDo.getAssignment().getHTMLURL());
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        writeErrFile();
-                        System.out.println("Was unable to parse the time it was due");
-                        SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
+                    // Just a note: even though the Date object is reporting that it is in CST it is actually in UTC time.
+                    int diffInDays = getDaysUntil(currentToDo.getAssignment().getDueAt());
+                    if (diffInDays == 7) {
+                        // Send out the message! It is a week before it is due.
+                        System.out.println("Send out the message! It is a week before it is due.");
+                        // Creating the description
+                        String description = "The assignment is due in one week at ";
+                        sendMessage(webhookUrlDiscord, currentToDo.getAssignment().getName(), description, currentToDo.getAssignment().getDueAt(), currentToDo.getAssignment().getHTMLURL());
+                    } else if (diffInDays == 1) {
+                        // Send out the message! It is a day before it is due
+                        System.out.println("Send out the message! It is a day before it is due.");
+                        // Creating the description
+                        String description = "The assignment is due tomorrow at ";
+                        sendMessage(webhookUrlDiscord, currentToDo.getAssignment().getName(), description, currentToDo.getAssignment().getDueAt(), currentToDo.getAssignment().getHTMLURL());
                     }
                 } else {
                     // Send out the message! This means it was the first time it was assigned.
                     System.out.println("Send out the message! This means it was the first time it was assigned.");
 
                     // Finding out how many days till it is due
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date dateNow = new Date();
-                    Date assignmentsDueDate;
-                    long diffInDays = 0;
-                    try {
-                        assignmentsDueDate = format.parse(currentToDo.getAssignment().getDueAt());
-                        long diffInMillis = Math.abs(assignmentsDueDate.getTime() - dateNow.getTime());
-                        diffInDays = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        writeErrFile();
-                        SlackWebhook.sendSlackMessage(webhookUrlSlack, "There has been an error. Please check the log files.");
-                    }
+                    int diffInDays = getDaysUntil(currentToDo.getAssignment().getDueAt());
 
                     // Creating the description
                     String description = diffInDays == 0 ? "The assignment is due on " : "The assignment is due in " + diffInDays + " days on ";
@@ -180,6 +173,9 @@ public class MainActivity {
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd' 'hh-mm-ss a");
         try {
+            // Log the Canvas JSON string we got (if any)
+            System.out.println(Converter.toJsonString(newToDos));
+            // Write all logs to file
             Files.write(Paths.get(format.format(now) + ".log"), newConsole.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
