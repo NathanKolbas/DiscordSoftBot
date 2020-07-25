@@ -1,8 +1,8 @@
 package com.discordsoftwebhook;
 
-import com.discordsoftwebhook.Rating;
 import com.fasterxml.jackson.annotation.*;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Rubric {
     private String id;
     private long points;

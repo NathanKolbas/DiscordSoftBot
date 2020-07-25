@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CanvasJSON {
     private String contextType;
     private long courseID;

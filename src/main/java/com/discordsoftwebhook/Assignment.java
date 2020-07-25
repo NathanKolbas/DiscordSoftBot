@@ -2,6 +2,7 @@ package com.discordsoftwebhook;
 
 import com.fasterxml.jackson.annotation.*;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Assignment {
     private long id;
     private String description;

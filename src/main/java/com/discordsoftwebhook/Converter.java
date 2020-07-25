@@ -6,9 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Converter {
     // Serialize/deserialize helpers
 

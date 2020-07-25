@@ -2,6 +2,7 @@ package com.discordsoftwebhook;
 
 import com.fasterxml.jackson.annotation.*;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Rating {
     private String id;
     private long points;
