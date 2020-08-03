@@ -1,6 +1,13 @@
-require "bundler/gem_tasks"
-require "rspec/core/rake_task"
+require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+namespace :test do
+  desc 'Run all the tests. Specify individual tests via TESTS.'
+  task :all do
+    puts 'Running tests...'
+
+    tests = ENV['TESTS']
+    puts `bundle exec rspec ./spec/* #{tests}`
+  end
+end
