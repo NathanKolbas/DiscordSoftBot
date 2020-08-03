@@ -1,39 +1,17 @@
 # DiscordSoftWebhook
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/DiscordSoftWebhook`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'DiscordSoftWebhook'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install DiscordSoftWebhook
-
 ## Usage
 
-TODO: Write usage instructions here
+This is used for sending wonderful and timely reminders on when a software engineering assignment is due at [UNL](https://www.unl.edu/). This is done by sending out a Discord message to our server. The `run_script.rb` file is what performs these tasks. Run that script and specify the Canvas token, Discord webhook URL, and optionally the Slack webhook URL you would like to report errors to (ie `Ruby ./lib/run_script.rb canvas_token discord_webhook slack_webhook`).
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests. Coverage reports are located in `/spec/log/coverage/index.html` and are generated when running `rake spec`. LOC is enforced but is currently not 100%. You can find the code and the DiscordSoftWebhook class located in the `/lib/` directory. Rubocop style checks are also enforced and can be changed in `.rubocop.yml`.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/DiscordSoftWebhook.
+Bug reports and pull requests are welcome on GitHub at: https://github.com/NathanKolbas/DiscordSoftWebhook.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+This code is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
