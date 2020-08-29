@@ -6,19 +6,21 @@ require 'json'
 
 # Sends out a Discord message with the todos for SOFT classes
 class DiscordSoftWebhook
-  attr_accessor :canvas_token, :discord_webhook, :slack_webhook
+  attr_accessor :canvas_token, :discord_webhook, :slack_webhook, :course_id
   JSON_FILE_NAME = 'CurrentToDos.json'.freeze
   SOFT161_ID = 80_912
   SOFT260_ID = nil
 
-  def initialize(canvas_token, discord_webhook, slack_webhook = nil)
+  def initialize(canvas_token, discord_webhook, course_id, slack_webhook = nil)
     # Validation
     raise 'No canvas token provided' unless canvas_token
     raise 'No Discord webhook URL provided' unless discord_webhook
+    raise 'No course ID provided' unless course_id
 
     # Set vars
     @canvas_token = canvas_token
     @discord_webhook = discord_webhook
+    @course_id = course_id
     @slack_webhook = slack_webhook
 
     # Setup discord
@@ -30,7 +32,7 @@ class DiscordSoftWebhook
   end
 
   def request_canvas_todos
-    url = "https://canvas.unl.edu/api/v1/courses/#{SOFT161_ID}/todo/"
+    url = "https://canvas.unl.edu/api/v1/courses/#{@course_id}/todo/"
     headers = {
       'Authorization': "Bearer #{@canvas_token}",
       'Content-Type': 'application/json',
@@ -100,7 +102,7 @@ class DiscordSoftWebhook
       send_message(des, assignment_name, assigment_link) if des
     end
 
-    # File.write(JSON_FILE_NAME, todos)
+    File.write(JSON_FILE_NAME, todos.to_json)
   end
 end
 

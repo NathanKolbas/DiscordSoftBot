@@ -3,9 +3,10 @@ require 'discord_soft_webhook'
 
 RSpec.describe DiscordSoftWebhook do
   describe '#initialize' do
-    subject { DiscordSoftWebhook.new(canvas_token, discord_webhook, slack_webhook) }
+    subject { DiscordSoftWebhook.new(canvas_token, discord_webhook, course_id, slack_webhook) }
     let(:canvas_token) { rand }
     let(:discord_webhook) { rand }
+    let(:course_id) { rand }
     let(:slack_webhook) { rand }
 
     it 'is successful' do
@@ -28,6 +29,14 @@ RSpec.describe DiscordSoftWebhook do
       end
     end
 
+    describe 'when missing course id' do
+      let(:course_id) { nil }
+
+      it 'errors' do
+        expect { subject }.to raise_error('No course ID provided')
+      end
+    end
+
     describe 'when no slack webhook is provided' do
       let(:slack_webhook) { nil }
 
@@ -38,7 +47,7 @@ RSpec.describe DiscordSoftWebhook do
   end
 
   describe '#past_todos' do
-    subject { DiscordSoftWebhook.new(rand, rand).past_todos }
+    subject { DiscordSoftWebhook.new(rand, rand, rand).past_todos }
     let(:file_exists) { true }
     let(:to_dos) do
       [

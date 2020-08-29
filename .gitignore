@@ -1,3 +1,5 @@
 .idea
 CurrentToDos.json
 /out
+/Ruby/DiscordSoftWebhook/spec/log
+/Ruby/DiscordSoftWebhook/Gemfile.lock

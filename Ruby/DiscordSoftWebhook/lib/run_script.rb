@@ -30,19 +30,22 @@ def required_args_msg(error_msg)
   msg = "\nTo start the messaging script you need to ".yellow
   msg << "provide these arguments in this order:\n".yellow
   msg << "1 = The canvas API token \n2 = Discord webhook URL".blue
-  msg << "\n3 = Slack webhook URL for error messages (optional)\n".blue
+  msg << "\n3 = Canvas Course ID to get todos for the course".blue
+  msg << "\n4 = Slack webhook URL for error messages (optional)\n".blue
   puts msg
   raise error_msg
 end
 
 required_args_msg 'No canvas token provided' unless ARGV[0]
 required_args_msg 'No Discord webhook URL provided' unless ARGV[1]
+required_args_msg 'No course ID provided' unless ARGV[1]
 
 canvas_token = ARGV[0]
 discord_webhook = ARGV[1]
-slack_webhook = ARGV[2]
+course_id = ARGV[2]
+slack_webhook = ARGV[3]
 
-dsw = DiscordSoftWebhook.new(canvas_token, discord_webhook, slack_webhook)
+dsw = DiscordSoftWebhook.new(canvas_token, discord_webhook, course_id, slack_webhook)
 todos = dsw.request_canvas_todos
 past_todos = dsw.past_todos
 dsw.run(todos, past_todos)
