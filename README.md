@@ -1,31 +1,15 @@
 # UNL Software Engineering Discord Bot
 
-## Libraries
-* https://gist.github.com/k3kdude/fba6f6b37594eae3d6f9475330733bdb
-* https://app.quicktype.io/
+## Usage
+This is used for sending wonderful and timely reminders on when a software engineering assignment is due at UNL. The script is not limited to our software engineering course since the arguments are free to be changed to whatever suits you. In other words, it could also be used for notifying when assignments are due in other classes on Canvas. This is done by sending out a Discord message to our server.
 
-## Parsing dates in Java example code
-##### Not sure if we'll need it in the future but just in case.
-```
-DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
- try {
-     Date date = dateFormatter.parse("2020-02-20T22:00:00Z");
-     System.out.println(date.getTime() - new Date().getTime());
-     System.out.println(date);
-     System.out.println(new Date(date.getTime() - TimeUnit.DAYS.toMillis(7)));
-     System.out.println((date.getTime() - TimeUnit.DAYS.toMillis(1)) - new Date().getTime());
+## Structure
+This project was originally written in Java, which is now deprecated, but is now maintained in Ruby. You can find the Java project in the "Java" folder and the Ruby project in the "Ruby" folder. Each has their own README with more information.
 
-     // Even though the Date object is reporting in CST it is actually in UTC time.
-     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-     format.setTimeZone(TimeZone.getTimeZone("UTC"));
-     System.out.println(format.format(new Date()));
-     System.out.println(new Date());
- } catch (ParseException e) {
-     e.printStackTrace();
- }
+## Contributing
 
+Bug reports and pull requests are welcome and appreciated on [GitHub](https://github.com/NathanKolbas/DiscordSoftWebhook)!
 
- long delay = ChronoUnit.MILLIS.between(LocalTime.now(), LocalTime.now().plusSeconds(10));
- ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
- scheduler.schedule(() -> call_me(SOFT161_ID), delay, TimeUnit.MILLISECONDS);
-```
+## License
+
+This code is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT)

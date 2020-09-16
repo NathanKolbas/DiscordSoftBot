@@ -1,6 +1,5 @@
 .idea
 CurrentToDos.json
 CurrentAssignments.json
-/out
-/Ruby/DiscordSoftWebhook/spec/log
-/Ruby/DiscordSoftWebhook/Gemfile.lock
+/Ruby/spec/log
+/Ruby/Gemfile.lock
