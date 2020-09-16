@@ -1,6 +1,7 @@
 require_relative 'discord_soft_webhook'
 
-# This script will create an instance of discord_soft_webhook which will handle the sending out of new todos to Discord
+# This script will create an instance of discord_soft_webhook which will handle the sending out of new assignments to
+# Discord
 
 # To change text color
 class String
@@ -24,21 +25,30 @@ class String
   def blue
     colorize(34)
   end
+
+  def light_blue
+    colorize(36)
+  end
 end
 
 def required_args_msg(error_msg)
+  canvas = "1. The canvas API token \n"
+  discord = "2. Discord webhook URL\n"
+  course = "3. Canvas Course ID to get assignments for the course\n"
+  inputs = [canvas, discord, course]
+
   msg = "\nTo start the messaging script you need to ".yellow
   msg << "provide these arguments in this order:\n".yellow
-  msg << "1 = The canvas API token \n2 = Discord webhook URL".blue
-  msg << "\n3 = Canvas Course ID to get todos for the course".blue
-  msg << "\n4 = Slack webhook URL for error messages (optional)\n".blue
+  3.times { |i| msg << (ARGV[i] ? inputs[i].green : inputs[i].red) }
+  msg << "4. Slack webhook URL for error messages (optional)\n\n".light_blue
   puts msg
+
   raise error_msg
 end
 
 required_args_msg 'No canvas token provided' unless ARGV[0]
 required_args_msg 'No Discord webhook URL provided' unless ARGV[1]
-required_args_msg 'No course ID provided' unless ARGV[1]
+required_args_msg 'No course ID provided' unless ARGV[2]
 
 canvas_token = ARGV[0]
 discord_webhook = ARGV[1]
@@ -46,6 +56,6 @@ course_id = ARGV[2]
 slack_webhook = ARGV[3]
 
 dsw = DiscordSoftWebhook.new(canvas_token, discord_webhook, course_id, slack_webhook)
-todos = dsw.request_canvas_todos
-past_todos = dsw.past_todos
-dsw.run(todos, past_todos)
+assignments = dsw.request_canvas_assignments
+past_assignments = dsw.past_assignments
+dsw.run(assignments, past_assignments)

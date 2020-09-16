@@ -2,7 +2,7 @@
 
 ## Usage
 
-This is used for sending wonderful and timely reminders on when a software engineering assignment is due at [UNL](https://www.unl.edu/). This is done by sending out a Discord message to our server. The `run_script.rb` file is what performs these tasks. Run that script and specify the Canvas token, Discord webhook URL, and optionally the Slack webhook URL you would like to report errors to (ie `Ruby ./lib/run_script.rb canvas_token discord_webhook slack_webhook`).
+This is used for sending wonderful and timely reminders on when a software engineering assignment is due at [UNL](https://www.unl.edu/). The script is not limited to our software engineering course since the arguments are free to be changed to whatever suits you. In other words, it could also be used for notifying when assignments are due in other classes on Canvas. This is done by sending out a Discord message to our server. The `run_script.rb` file is what performs these tasks. Run that script and specify the Canvas token, Discord webhook URL, Canvas course ID, and optionally the Slack webhook URL if you would like to report errors (ie `Ruby ./lib/run_script.rb canvas_token discord_webhook slack_webhook`).
 
 ## Development
 

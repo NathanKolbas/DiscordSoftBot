@@ -4,12 +4,10 @@ require 'httparty'
 require 'slack-notifier'
 require 'json'
 
-# Sends out a Discord message with the todos for SOFT classes
+# Sends out a Discord message with the assignments for a specified class
 class DiscordSoftWebhook
   attr_accessor :canvas_token, :discord_webhook, :slack_webhook, :course_id
-  JSON_FILE_NAME = 'CurrentToDos.json'.freeze
-  SOFT161_ID = 80_912
-  SOFT260_ID = nil
+  JSON_FILE_NAME = 'CurrentAssignments.json'.freeze
 
   def initialize(canvas_token, discord_webhook, course_id, slack_webhook = nil)
     # Validation
@@ -31,29 +29,29 @@ class DiscordSoftWebhook
     end
   end
 
-  def request_canvas_todos
-    url = "https://canvas.unl.edu/api/v1/courses/#{@course_id}/todo/"
-    headers = {
-      'Authorization': "Bearer #{@canvas_token}",
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'User-Agent': 'Mozilla/5.0'
+  def request_canvas_assignments
+    url = "https://canvas.unl.edu/api/v1/courses/#{@course_id}/assignments/"
+    options = {
+      headers: {
+        'Authorization': "Bearer #{@canvas_token}",
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0'
+      },
+      body: { bucket: 'future' }.to_json
     }
-    response = HTTParty.get(url, headers: headers)
+
+    response = HTTParty.get(url, options)
     unless response.success?
-      err_msg = "Error getting todos from Canvas: {code: #{response.code}, body: #{response.body}}"
+      err_msg = "Error getting assignments from Canvas: {code: #{response.code}, body: #{response.body}}"
       raise SendSlackException, @slack_webhook, err_msg
     end
 
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def past_todos
+  def past_assignments
     JSON.parse(File.read(JSON_FILE_NAME), symbolize_names: true) if File.exist? JSON_FILE_NAME
-  end
-
-  def days_until(date)
-    (date - DateTime.now).round
   end
 
   def send_message(des, title, url, color: '#FF0000')
@@ -66,24 +64,24 @@ class DiscordSoftWebhook
     Discord::Notifier.message(embed)
   end
 
-  def run(todos, old_todos)
-    raise SendSlackException, @slack_webhook, 'No todos received' unless todos
+  def run(assignments, old_assignments)
+    raise SendSlackException, @slack_webhook, 'No assignments received' unless assignments
 
-    old_ids = old_todos&.map { |t| t[:assignment][:id] }
-    todos.each do |t|
+    old_ids = old_assignments&.map { |t| t[:id] }
+    assignments.each do |t|
       # Check each to-do
       # Currently setup to send out when assigned, one week, and the day before.
-      due_date = DateTime.parse(t[:assignment][:due_at])
-      assignment_name = t[:assignment][:name]
-      assigment_link = t[:assignment][:html_url]
-      due_time = due_date.strftime('%l:%M %p')
-      due_date_formatted = due_date.strftime('%m/%d/%Y at %l:%M %p')
-      diff_in_days = days_until(due_date)
+      due_date = DateTime.parse(t[:due_at]).new_offset(Time.now.zone)
+      assignment_name = t[:name]
+      assigment_link = t[:html_url]
+      due_time = due_date.strftime('%l:%M %p').strip
+      due_date_formatted = due_date.strftime('%m/%d/%Y at ') + due_date.strftime('%l:%M %p').strip
+      diff_in_days = (due_date - DateTime.now).round
       des = nil
 
-      if old_ids&.include? t[:assignment][:id]
+      if old_ids&.include? t[:id]
         if diff_in_days == 7
-          # 7 day until the assignment is due
+          # 7 days until the assignment is due
           des = "The assignment is due in one week on #{due_date_formatted}"
         elsif diff_in_days == 1
           # 1 day until the assignment is due
@@ -102,7 +100,7 @@ class DiscordSoftWebhook
       send_message(des, assignment_name, assigment_link) if des
     end
 
-    File.write(JSON_FILE_NAME, todos.to_json)
+    File.write(JSON_FILE_NAME, assignments.to_json)
   end
 end
 

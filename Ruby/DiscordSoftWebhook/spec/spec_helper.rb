@@ -2,7 +2,7 @@ require 'bundler/setup'
 require 'simplecov'
 
 SimpleCov.coverage_dir('spec/log/coverage')
-SimpleCov.minimum_coverage 63.72 # Once there is full coverage change this to 100
+SimpleCov.minimum_coverage 89.33 # Once there is full coverage change this to 100
 SimpleCov.start
 
 RSpec.configure do |config|
