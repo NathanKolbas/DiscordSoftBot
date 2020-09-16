@@ -3,11 +3,21 @@ require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
 namespace :test do
-  desc 'Run all the tests. Specify individual tests via TESTS.'
+  desc 'Run all the tests. Specify individual tests via TESTS. Specify arguments with ARGS.'
   task :all do
-    puts 'Running tests...'
+    puts 'Running rspec tests...'
 
-    tests = ENV['TESTS']
-    puts `bundle exec rspec ./spec/* #{tests}`
+    tests = ENV['TESTS'] || './spec/*'
+    puts `bundle exec rspec --tty #{ENV['ARGS']} #{tests}`
+  end
+end
+
+namespace :style do
+  desc 'Runs Rubocop style checker on all files. Specify individual tests via TESTS. Specify arguments with ARGS (such as -a to autocorrect).'
+  task :all do
+    puts 'Running Rubocop...'
+
+    tests = ENV['TESTS'] || './lib/* ./spec/*'
+    puts `rubocop --color #{ENV['ARGS']} #{tests}`
   end
 end

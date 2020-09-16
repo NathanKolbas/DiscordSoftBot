@@ -171,9 +171,9 @@ RSpec.describe DiscordSoftWebhook do
 
         it 'sends a message' do
           expect(dsw).to receive(:send_message).with(
-              "The assignment is due tomorrow at #{due_time.strftime('%l:%M %p').strip}",
-              assignments[0][:name],
-              assignments[0][:html_url]
+            "The assignment is due tomorrow at #{due_time.strftime('%l:%M %p').strip}",
+            assignments[0][:name],
+            assignments[0][:html_url]
           )
           allow(File).to receive(:write)
           subject

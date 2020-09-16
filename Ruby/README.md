@@ -6,4 +6,4 @@ This is used for sending wonderful and timely reminders on when a software engin
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests. Coverage reports are located in `/spec/log/coverage/index.html` and are generated when running `rake spec`. LOC is enforced but is currently not 100%. You can find the code and the DiscordSoftWebhook class located in the `/lib/` directory. Rubocop style checks are also enforced and can be changed in `.rubocop.yml`.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rake test:all` to run the tests. Coverage reports are located in `/spec/log/coverage/index.html` and are generated when running `rake test:all`. LOC is enforced but is currently not 100%. You can find the code and the DiscordSoftWebhook class located in the `/lib/` directory. Rubocop style checks are also enforced and can be changed in `.rubocop.yml`. To run style checks use `rake style:all`.
