@@ -70,6 +70,8 @@ class DiscordSoftWebhook
     old_ids = old_assignments&.map { |t| t[:id] }
     assignments.each do |t|
       # Check each to-do
+      next if t[:due_at].nil? # Skip if the assignment has no due date
+
       # Currently setup to send out when assigned, one week, and the day before.
       due_date = DateTime.parse(t[:due_at]).new_offset(Time.now.zone)
       assignment_name = t[:name]
