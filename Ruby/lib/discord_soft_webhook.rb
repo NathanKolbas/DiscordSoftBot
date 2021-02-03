@@ -78,7 +78,7 @@ class DiscordSoftWebhook
       assigment_link = t[:html_url]
       due_time = due_date.strftime('%l:%M %p').strip
       due_date_formatted = due_date.strftime('%m/%d/%Y at ') + due_date.strftime('%l:%M %p').strip
-      diff_in_days = (due_date - DateTime.now).round
+      diff_in_days = (due_date.to_date - DateTime.now.to_date).round
       des = nil
 
       if old_ids&.include? t[:id]
